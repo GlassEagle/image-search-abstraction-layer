@@ -23,6 +23,7 @@ function imagesearchHandler(req, res){
         });
         
         pixabay_res.on("end", function(){
+            res.setHeader("content-type", "application/json");
             res.send(rawData);
         });
     }  
