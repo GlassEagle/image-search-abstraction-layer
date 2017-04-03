@@ -3,6 +3,7 @@
 var config = require(process.env.HOME + "/secret/config.js");
 var pixabay_api_key = config.pixabay_api_key;
 var https = require("https");
+var recentSearch = require("../models/recentSearches.js");
 
 function imagesearchHandler(req, res){
     var hostname = "pixabay.com";
@@ -11,6 +12,12 @@ function imagesearchHandler(req, res){
         "&q=" + req.params.query +
         "&per_page=10" +
         "&page=" + req.query.offset;
+    
+    var latest = new recentSearch();
+    latest.term = req.params.query;
+    latest.save(function(err){
+        if (err) console.log(err);
+    });
         
     var options = {"hostname": hostname, "path": path};
     https.get(options, pixabay_callback);
