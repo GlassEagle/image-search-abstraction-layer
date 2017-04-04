@@ -6,6 +6,9 @@ var https = require("https");
 var recentSearch = require("../models/recentSearches.js");
 
 function imagesearchHandler(req, res){
+    if(undefined == req.query.offset || req.query.offset < 1){
+        req.query.offset = 1;
+    }
     var hostname = "pixabay.com";
     var path = "/api/?" +
         "key=" + pixabay_api_key +
