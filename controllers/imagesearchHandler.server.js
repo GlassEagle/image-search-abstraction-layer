@@ -1,5 +1,11 @@
 "use strict";
 
+var cacheManager = require("cache-manager");
+var mongooseStore = require("cache-manager-mongoose");
+var memoryCache = cacheManager.caching({store: "memory", max: 100, ttl: 60});
+//TODO: change ttl to 24 hours
+//TODO: use mongooseStore insead of memory cache
+
 var config = require(process.env.HOME + "/secret/config.js");
 var pixabay_api_key = config.pixabay_api_key;
 var https = require("https");
@@ -23,22 +29,32 @@ function imagesearchHandler(req, res){
     });
         
     var options = {"hostname": hostname, "path": path};
-    https.get(options, pixabay_callback);
-  
-    function pixabay_callback(pixabay_res){
-        let rawData = "";
-        
-        pixabay_res.on("data", function(chunk){
-            rawData+=chunk;
-        });
-        
-        pixabay_res.on("end", function(){
-            var toSend = parse_pixabay_results(rawData);
-            toSend = JSON.stringify(toSend);
-            res.setHeader("content-type", "application/json");
-            res.send(toSend);
-        });
-    }  
+    getPixabayQuery(options.path, sendJSON);
+    
+    function sendJSON(err, data){
+        //process data
+        if(err) {throw err};
+        res.setHeader("content-type", "application/json");
+        res.send(data);
+    }
+    
+    function getPixabayQuery(id, cb){
+        memoryCache.wrap(id, function(cacheCallback){
+            //not in cache, get from pixabay
+            let data = "";
+            https.get(options, function(pixabay_response){
+                pixabay_response.on("data", function(chunk){
+                    data += chunk;
+                });
+                pixabay_response.on("end", function(){
+                    data = parse_pixabay_results(data);
+                    data = JSON.stringify(data);
+                    memoryCache.set(id, data);
+                    cacheCallback(null, data);
+                })
+            });
+        }, cb);
+    }
 }
 
 function parse_pixabay_results(json){
