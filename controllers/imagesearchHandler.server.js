@@ -4,12 +4,13 @@ var mongoose = require("mongoose");
 var cacheManager = require("cache-manager");
 var mongooseStore = require("cache-manager-mongoose");
 
+var cache_ttl = 60*60*24; //seconds in 24 hours
+
 var cache = cacheManager.caching({
     store: mongooseStore,
     mongoose, mongoose,
-    ttl: 60
+    ttl: cache_ttl
 });
-//TODO: change ttl to 24 hours
 
 var config = require(process.env.HOME + "/secret/config.js");
 var pixabay_api_key = config.pixabay_api_key;
