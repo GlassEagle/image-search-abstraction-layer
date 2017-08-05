@@ -1,10 +1,15 @@
 "use strict";
 
+var mongoose = require("mongoose");
 var cacheManager = require("cache-manager");
 var mongooseStore = require("cache-manager-mongoose");
-var memoryCache = cacheManager.caching({store: "memory", max: 100, ttl: 60});
+
+var cache = cacheManager.caching({
+    store: mongooseStore,
+    mongoose, mongoose,
+    ttl: 60
+});
 //TODO: change ttl to 24 hours
-//TODO: use mongooseStore insead of memory cache
 
 var config = require(process.env.HOME + "/secret/config.js");
 var pixabay_api_key = config.pixabay_api_key;
@@ -39,7 +44,7 @@ function imagesearchHandler(req, res){
     }
     
     function getPixabayQuery(id, cb){
-        memoryCache.wrap(id, function(cacheCallback){
+        cache.wrap(id, function(cacheCallback){
             //not in cache, get from pixabay
             let data = "";
             https.get(options, function(pixabay_response){
@@ -49,7 +54,7 @@ function imagesearchHandler(req, res){
                 pixabay_response.on("end", function(){
                     data = parse_pixabay_results(data);
                     data = JSON.stringify(data);
-                    memoryCache.set(id, data);
+                    cache.set(id, data);
                     cacheCallback(null, data);
                 })
             });
