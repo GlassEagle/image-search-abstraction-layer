@@ -28,11 +28,7 @@ function imagesearchHandler(req, res){
         "&per_page=10" +
         "&page=" + req.query.offset;
     
-    var latest = new recentSearch();
-    latest.term = req.params.query;
-    latest.save(function(err){
-        if (err) console.log(err);
-    });
+    saveLatestSearch(req.params.query);
         
     var options = {"hostname": hostname, "path": path};
     getPixabayQuery(options.path, sendJSON);
@@ -78,6 +74,14 @@ function parse_pixabay_results(json){
     }
     
     return hits;
+}
+
+function saveLatestSearch(query){
+    var latest = new recentSearch();
+    latest.term = query;
+    latest.save(function(err){
+        if (err) console.log(err);
+    });
 }
 
 module.exports = imagesearchHandler;
