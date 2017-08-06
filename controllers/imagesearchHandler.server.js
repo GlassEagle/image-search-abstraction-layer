@@ -27,6 +27,7 @@ function imagesearchHandler(req, res){
         "&q=" + req.params.query +
         "&per_page=10" +
         "&page=" + req.query.offset;
+    path = encodeURI(path);
     
     saveLatestSearch(req.params.query);
         
@@ -49,11 +50,23 @@ function imagesearchHandler(req, res){
                     data += chunk;
                 });
                 pixabay_response.on("end", function(){
-                    data = parse_pixabay_results(data);
+                    if(200 == pixabay_response.statusCode){
+                        //status code ok, parse the results
+                        //otherwise dont parse and just use as is
+                        data = parse_pixabay_results(data);
+                    }
+                    
                     data = JSON.stringify(data);
                     cache.set(id, data);
                     cacheCallback(null, data);
-                })
+                });
+                pixabay_response.on("error", function(err){
+                    //return an error page
+                    if(err){
+                        console.log(err);
+                        res.status(400).send("[ERROR 400]");
+                    }
+                });
             });
         }, cb);
     }
