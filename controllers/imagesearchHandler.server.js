@@ -36,7 +36,11 @@ function imagesearchHandler(req, res){
     
     function sendJSON(err, data){
         //process data
-        if(err) {throw err};
+        if(err) {
+            console.log(err);
+            res.send(data);
+            return;
+        }
         res.setHeader("content-type", "application/json");
         res.send(data);
     }
