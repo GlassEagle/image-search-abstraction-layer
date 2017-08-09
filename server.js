@@ -8,8 +8,9 @@ var express = require("express");
 
 var app = express()
 var mongoose = require("mongoose")
+mongoose.Promise = global.Promise;
 
-mongoose.connect("mongodb://localhost:27017/data");
+mongoose.connect("mongodb://localhost:27017/data", {useMongoClient: true});
 
 app.get('/', function(req, res){
   res.sendFile(process.cwd() + "/public/index.html");
