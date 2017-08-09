@@ -1,4 +1,4 @@
-"using strict"
+"use strict";
 
 var path = process.cwd()
 var imagescearchHandler = require(path + "/controllers/imagesearchHandler.server.js")
