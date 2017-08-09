@@ -18,6 +18,6 @@ app.get('/', function(req, res){
 app.get("/api/imagesearch/:query", imagescearchHandler)
 app.get("/api/latest/imagesearch", latestimagesearchHandler)
 
-app.listen(8080, function () {
-  console.log('Example app listening on port 3000!')
+app.listen(process.env.PORT, function () {
+  console.log('App listening on port %s!', process.env.PORT)
 })
