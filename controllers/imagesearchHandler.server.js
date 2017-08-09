@@ -8,7 +8,7 @@ var cache_ttl = 60*60*24; //seconds in 24 hours
 
 var cache = cacheManager.caching({
     store: mongooseStore,
-    mongoose, mongoose,
+    mongoose: mongoose,
     ttl: cache_ttl
 });
 
